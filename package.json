@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Comparte fotos de los pibes...",
   "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srostagno/pibesgram.git"
+  },
   "scripts": {
     "build": "gulp",
     "start": "gulp watch & node server.js"
@@ -11,7 +15,10 @@
     "platzi",
     "javascript",
     "pibes",
-    "chorros"
+    "chorros",
+    "node",
+    "heroku",
+    "express"
   ],
   "author": "Silvio Rostagno",
   "license": "MIT",
