@@ -2,33 +2,58 @@ var page = require('page');
 var empty = require('empty-element');
 var template = require('./template');
 var title = require('title');
+var request = require('superagent');
+var header = require('../header');
+var axios = require('axios')
 
-page('/', function (ctx, next) {
+page('/', header, asyncLoad, function (ctx, next) {
   title('PibesGram');
   var main = document.getElementById('main-container');
 
-  var pictures = [
-    {
-      user: {
-        username: 'Silvio Rostagno',
-        avatar: 'https://lh3.googleusercontent.com/-Bj8eX68PBkA/AAAAAAAAAAI/AAAAAAAAAAA/RZ7Pgzxm-n4/photo.jpg'
-      },
-      url: 'sample1.jpg',
-      likes: 10,
-      liked: false,
-      createdAt: new Date()
-    },
-    {
-      user: {
-        username: 'Silvio Rostagno',
-        avatar: 'https://lh3.googleusercontent.com/-Bj8eX68PBkA/AAAAAAAAAAI/AAAAAAAAAAA/RZ7Pgzxm-n4/photo.jpg'
-      },
-      url: 'sample2.jpg',
-      likes: 10,
-      liked: false,
-      createdAt: new Date().setDate(new Date().getDate()-10)
-    },
-  ];
-
-  empty(main).appendChild(template(pictures));
+  empty(main).appendChild(template(ctx.pictures));
 })
+
+function loadPictures(ctx, next) {
+  request
+    .get('/api/pictures')
+    .end(function (err, res) {
+      ctx.pictures = res.body;
+      next();
+  })
+}
+
+function loadPicturesAxios(ctx, next) {
+  axios
+    .get('/api/pictures')
+    .then(function (res) {
+      ctx.pictures = res.data;
+      next();
+  })
+    .then(function (res) {
+      ctx.pictures =res.data-activate
+      next();
+    })
+}
+
+function loadPicturesFetch(ctx, next) {
+  fetch('/api/pictures')
+    .then(function (res) {
+      return res.json();
+  })
+    .then(function (pictures) {
+      ctx.pictures = pictures;
+      next();
+    })
+    .catch(function (err) {
+      console.log(err);
+    })
+}
+
+async function asyncLoad(ctx, next) {
+  try {
+    ctx.pictures = await fetch('/api/pictures').then(res => res.json());
+    next();
+  } catch (err) {
+    return console.log(err);
+  }
+}
